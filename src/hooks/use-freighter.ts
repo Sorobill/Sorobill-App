@@ -10,6 +10,7 @@ import {
   signTransaction as freighterSignTransaction,
 } from "@stellar/freighter-api";
 import { useWalletStore } from "@/stores/wallet-store";
+import { freighterUserMessage } from "@/lib/freighter-errors";
 
 function mapNetwork(network: string): "testnet" | "mainnet" {
   return network.toLowerCase().includes("public") || network.toLowerCase().includes("main")
@@ -91,8 +92,7 @@ export function useFreighter() {
         network: mapNetwork(network),
       });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to connect wallet";
-      setError(msg);
+      setError(freighterUserMessage(err));
     } finally {
       setIsConnecting(false);
     }
