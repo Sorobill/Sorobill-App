@@ -8,3 +8,12 @@ export function useLiveApi(): boolean {
 export function apiBase(): string {
   return env.app.apiUrl.replace(/\/$/, "");
 }
+
+/** Default JSON headers for Backend REST calls. */
+export function apiHeaders(extra?: HeadersInit): HeadersInit {
+  return {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    ...(extra ?? {}),
+  };
+}
