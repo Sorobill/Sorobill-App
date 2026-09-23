@@ -1,10 +1,11 @@
+/** Keyboard skip link — target `#main-content` (also accept legacy `#main`). */
 export function SkipLink() {
   return (
     <a
-      href="#main"
+      href="#main-content"
       className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-teal-400 focus:px-3 focus:py-2 focus:text-slate-950"
     >
-      Skip to content
+      Skip to main content
     </a>
   );
 }
