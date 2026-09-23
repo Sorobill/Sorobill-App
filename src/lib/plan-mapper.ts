@@ -1,4 +1,5 @@
-import type { BillingInterval, Plan, SupportedAsset } from "@/types";
+import type { Plan, SupportedAsset } from "@/types";
+import { parseBillingInterval } from "@/lib/intervals";
 
 /** Backend plan row (Prisma / API). */
 export interface ApiPlan {
@@ -18,14 +19,6 @@ export interface ApiPlan {
   updatedAt?: string;
 }
 
-function mapInterval(raw: string): BillingInterval {
-  const v = raw.toLowerCase();
-  if (v === "daily" || v === "weekly" || v === "monthly" || v === "yearly") {
-    return v;
-  }
-  return "monthly";
-}
-
 export function mapApiPlan(p: ApiPlan, subscriberCount = 0): Plan {
   return {
     id: p.id,
@@ -34,7 +27,7 @@ export function mapApiPlan(p: ApiPlan, subscriberCount = 0): Plan {
     description: p.description ?? "",
     price: p.amount,
     asset: (p.assetCode || "XLM") as SupportedAsset,
-    interval: mapInterval(p.interval),
+    interval: parseBillingInterval(p.interval),
     trialDays: p.trialDays ?? 0,
     isActive: p.isActive,
     createdAt: p.createdAt,
