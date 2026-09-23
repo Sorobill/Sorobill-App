@@ -49,7 +49,9 @@ export async function prepareSignAndSend(
   buildOp: (contract: Contract) => xdr.Operation
 ): Promise<{ hash: string; signedXdr: string; result: unknown }> {
   if (!contractId) {
-    throw new Error("Soroban contract ID is not configured.");
+    throw new Error(
+      "Soroban contract ID is not configured. Set NEXT_PUBLIC_SUBSCRIPTION_CONTRACT_ID (or the token contract id) in .env.local."
+    );
   }
 
   const source = await getSourceAccount(publicKey);
@@ -64,7 +66,10 @@ export async function prepareSignAndSend(
 
   const simulated = await sorobanServer.simulateTransaction(tx);
   if (rpc.Api.isSimulationError(simulated)) {
-    throw new Error(simulated.error ?? "Soroban simulation failed");
+    throw new Error(
+      simulated.error ??
+        "Soroban simulation failed. Check Freighter network (Testnet), account funds, and contract IDs."
+    );
   }
 
   const prepared = await sorobanServer.prepareTransaction(tx);
@@ -80,7 +85,10 @@ export async function prepareSignAndSend(
 
   if (!signedXdr) {
     const err = (signResult as { error?: string })?.error;
-    throw new Error(err ?? "Freighter did not return signed XDR");
+    throw new Error(
+      err ??
+        "Freighter did not return signed XDR. Unlock the wallet and approve the prompt."
+    );
   }
 
   const sent = await sorobanServer.sendTransaction(
@@ -91,7 +99,9 @@ export async function prepareSignAndSend(
   const started = Date.now();
   while (status.status === rpc.Api.GetTransactionStatus.NOT_FOUND) {
     if (Date.now() - started > 60_000) {
-      throw new Error(`Timed out waiting for tx ${sent.hash}`);
+      throw new Error(
+        `Timed out waiting for transaction ${sent.hash}. Check Stellar Expert or retry shortly.`
+      );
     }
     await new Promise((r) => setTimeout(r, 1500));
     status = await sorobanServer.getTransaction(sent.hash);
@@ -109,13 +119,21 @@ export async function prepareSignAndSend(
 
 export function requireSubscriptionContractId(): string {
   const id = env.contracts.subscription;
-  if (!id) throw new Error("NEXT_PUBLIC_SUBSCRIPTION_CONTRACT_ID is not configured.");
+  if (!id) {
+    throw new Error(
+      "NEXT_PUBLIC_SUBSCRIPTION_CONTRACT_ID is not configured. Copy it from Sorobill-Contract DEPLOYMENTS.md."
+    );
+  }
   return id;
 }
 
 export function requireTokenContractId(): string {
   const id = env.contracts.token;
-  if (!id) throw new Error("NEXT_PUBLIC_TOKEN_CONTRACT_ID is not configured.");
+  if (!id) {
+    throw new Error(
+      "NEXT_PUBLIC_TOKEN_CONTRACT_ID is not configured. Set the SAC/token contract id for approve + pay."
+    );
+  }
   return id;
 }
 
@@ -143,7 +161,9 @@ export async function invokeCreatePlan(
 
   const contractPlanId = Number(result);
   if (!Number.isFinite(contractPlanId) || contractPlanId < 0) {
-    throw new Error("create_plan did not return a valid on-chain plan id");
+    throw new Error(
+      "create_plan did not return a valid on-chain plan id. Confirm the contract version matches this app."
+    );
   }
 
   return { hash, contractPlanId };
@@ -159,7 +179,9 @@ export async function invokeSubscribe(
 ): Promise<{ hash: string }> {
   const planId = typeof contractPlanId === "string" ? Number(contractPlanId) : contractPlanId;
   if (!Number.isFinite(planId) || planId < 0) {
-    throw new Error("Invalid on-chain plan id for subscribe");
+    throw new Error(
+      "Invalid on-chain plan id for subscribe. This API plan may be missing contractPlanId."
+    );
   }
 
   const contractId = requireSubscriptionContractId();
