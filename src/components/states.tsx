@@ -36,14 +36,17 @@ export function ErrorState({
   onRetry?: () => void;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 px-4 py-16 text-center text-muted-foreground sm:py-20">
-      <AlertCircle className="h-8 w-8 text-destructive" />
+    <div
+      className="flex flex-col items-center justify-center gap-3 px-4 py-16 text-center text-muted-foreground sm:py-20"
+      role="alert"
+    >
+      <AlertCircle className="h-8 w-8 text-destructive" aria-hidden />
       {title && (
         <p className="font-display text-base font-semibold text-foreground">{title}</p>
       )}
       <p className="max-w-sm text-sm">{message}</p>
       {onRetry && (
-        <Button variant="outline" size="sm" onClick={onRetry}>
+        <Button variant="outline" size="sm" onClick={onRetry} aria-label="Retry loading">
           Try again
         </Button>
       )}
