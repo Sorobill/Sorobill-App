@@ -1,9 +1,19 @@
-# Contributing to Sorobill Frontend
+# Contributing
 
-Please read [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for the full guide.
+Thanks for helping with Sorobill App.
 
-Quick start:
-1. Fork and clone
-2. `npm install && npm run dev`
-3. Use conventional commits (`feat:`, `fix:`, `docs:`)
-4. Open a PR against `main`
+## Quick links
+
+- Full guide: [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md)
+- Demo: [DEMO.md](./DEMO.md) — live app at https://sorobill-app.vercel.app
+- Architecture: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
+
+## Local setup
+
+```bash
+npm install
+cp .env.example .env.local
+npm run dev
+```
+
+Before opening a PR: `npm run type-check` and `npm run build`.
