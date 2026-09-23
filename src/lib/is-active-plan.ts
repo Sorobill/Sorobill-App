@@ -1,5 +1,7 @@
-import type { ApiPlan } from "@/lib/plan-mapper";
+import type { Plan } from "@/types";
 
-export function isActivePlan(p: ApiPlan): boolean {
-  return Boolean(p.isActive);
+/** Whether a plan should appear in public discovery / checkout. */
+export function isActivePlan(plan: Pick<Plan, "isActive"> | { isActive?: boolean } | null | undefined): boolean {
+  if (!plan) return false;
+  return plan.isActive === true;
 }
