@@ -123,3 +123,19 @@ export interface RevenueDataPoint {
   revenue: number;
   subscribers: number;
 }
+
+
+// ─── Checkout ────────────────────────────────────────────────────────────────
+
+export type PayCheckoutPhase =
+  | "idle"
+  | "approving"
+  | "subscribing"
+  | "success"
+  | "error";
+
+export interface PayCheckoutStatus {
+  phase: PayCheckoutPhase;
+  message?: string;
+  txHash?: string;
+}
