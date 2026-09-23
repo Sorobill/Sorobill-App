@@ -23,3 +23,9 @@ Use this after contract redeploy + backend + app are running.
 - No mock data in the happy path
 - On-chain tx hash visible
 - Sister repos linked from README
+
+## Hosted demo
+
+Production UI: https://sorobill-app.vercel.app
+
+When reviewing the hosted app, confirm `NEXT_PUBLIC_USE_MOCK=false` on Vercel and that Freighter is on Testnet.
