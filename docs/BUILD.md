@@ -55,3 +55,11 @@ Set env in the Vercel dashboard (or import `.env.production`):
 - Contract ID / API URL when you go live
 
 Live: [https://sorobill-app.vercel.app](https://sorobill-app.vercel.app)
+
+## Unit tests
+
+```bash
+npm run test
+```
+
+Vitest covers formatters, plan-share, mappers, and CSV helpers under `src/lib/__tests__/`.
