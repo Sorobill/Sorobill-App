@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { LoadingState, ErrorState, EmptyState } from "@/components/states";
 import { env } from "@/lib/env";
 import { mapApiPlan, type ApiPlan } from "@/lib/plan-mapper";
+import { validateApiPlan } from "@/lib/validate-api-plan";
 import { formatAssetAmount, formatInterval } from "@/lib/format";
 import { invokeApproveToken, invokeSubscribe } from "@/lib/contract";
 import { useWalletStore } from "@/stores/wallet-store";
@@ -34,7 +35,8 @@ async function fetchPlan(id: string): Promise<ApiPlan> {
   }
   const res = await fetch(`${env.app.apiUrl.replace(/\/$/, "")}/plans/${id}`);
   if (!res.ok) throw new Error("Plan not found. Check the share link or ask the merchant for a new one.");
-  return res.json();
+  const json: unknown = await res.json();
+  return validateApiPlan(json);
 }
 
 export default function PayPlanPage({
