@@ -1,15 +1,12 @@
-/** Lightweight analytics helpers (no third-party SDK required). */
-export type AnalyticsEvent =
-  | "pay_view"
-  | "pay_subscribe_click"
-  | "plans_view"
-  | "csv_export";
+export type AnalyticsPayload = Record<string, string | number | boolean | null | undefined>;
 
-export function track(event: AnalyticsEvent, props?: Record<string, string | number>) {
+/** Dispatch a first-party analytics event (`sorobill:analytics`). */
+export function track(name: string, payload: AnalyticsPayload = {}) {
   if (typeof window === "undefined") return;
-  if (process.env.NODE_ENV === "development") {
-    // eslint-disable-next-line no-console
-    console.debug("[analytics]", event, props ?? {});
-  }
-  window.dispatchEvent(new CustomEvent("sorobill:analytics", { detail: { event, props } }));
+  if (!name.trim()) return;
+  window.dispatchEvent(
+    new CustomEvent("sorobill:analytics", {
+      detail: { name, ...payload, ts: Date.now() },
+    })
+  );
 }
