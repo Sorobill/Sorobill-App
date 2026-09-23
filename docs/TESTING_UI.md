@@ -11,7 +11,7 @@ Follow [DEMO_SCRIPT.md](./DEMO_SCRIPT.md) with Freighter on Testnet:
 
 ## Automated
 
-- **Unit** — Vitest for pure libs (`format`, `plan-share`, `plan-mapper`, `csv`, `env` helpers)
+- **Unit** — `npm run test` (Vitest) for pure libs (`format`, `plan-share`, `plan-mapper`, `csv`, `env` helpers)
 - **E2E (planned)** — Playwright for `/plans` and `/pay/[id]` happy paths in mock mode
 
 ## Commands
@@ -19,7 +19,7 @@ Follow [DEMO_SCRIPT.md](./DEMO_SCRIPT.md) with Freighter on Testnet:
 ```bash
 npm run type-check
 npm run lint
-npm run test        # once Vitest is added
+npm run test
 npm run build
 ```
 
