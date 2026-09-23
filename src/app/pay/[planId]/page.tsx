@@ -13,6 +13,9 @@ import { mapApiPlan, type ApiPlan } from "@/lib/plan-mapper";
 import { formatAssetAmount, formatInterval } from "@/lib/format";
 import { invokeApproveToken, invokeSubscribe } from "@/lib/contract";
 import { useWalletStore } from "@/stores/wallet-store";
+import { SUBSCRIBE_COPY } from "@/lib/subscribe-copy";
+import { networkHint } from "@/lib/network-label";
+import { announce } from "@/lib/a11y";
 
 async function fetchPlan(id: string): Promise<ApiPlan> {
   if (env.app.useMock) {
@@ -30,7 +33,7 @@ async function fetchPlan(id: string): Promise<ApiPlan> {
     };
   }
   const res = await fetch(`${env.app.apiUrl.replace(/\/$/, "")}/plans/${id}`);
-  if (!res.ok) throw new Error("Plan not found");
+  if (!res.ok) throw new Error("Plan not found. Check the share link or ask the merchant for a new one.");
   return res.json();
 }
 
@@ -54,7 +57,7 @@ export default function PayPlanPage({
     if (!address || !data) return;
     const onChainId = data.contractPlanId;
     if (onChainId == null) {
-      setErrorMsg("This plan is not linked to an on-chain contractPlanId yet.");
+      setErrorMsg(SUBSCRIBE_COPY.missingContractPlan);
       return;
     }
 
@@ -63,15 +66,20 @@ export default function PayPlanPage({
     setStatus(null);
     try {
       if (env.app.useMock) {
-        setStatus("Demo mode: subscription recorded. Connect contracts for live Freighter flow.");
+        setStatus(SUBSCRIBE_COPY.mockSuccess);
+        announce(SUBSCRIBE_COPY.mockSuccess);
         return;
       }
       const approveAmount = String(Number(data.amount) * 12);
       setStatus("Approving token allowance…");
+      announce("Approving token allowance");
       await invokeApproveToken(address, approveAmount);
       setStatus("Signing subscribe…");
+      announce("Signing subscribe transaction");
       const { hash } = await invokeSubscribe(address, onChainId);
-      setStatus(`Subscribed. Tx ${hash.slice(0, 10)}…`);
+      const ok = `Subscribed. Tx ${hash.slice(0, 10)}…`;
+      setStatus(ok);
+      announce(ok);
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : "Subscribe failed");
       setStatus(null);
@@ -121,7 +129,7 @@ export default function PayPlanPage({
           <div className="space-y-3 border border-border bg-background p-5">
             {!address ? (
               <p className="text-sm text-amber-800 dark:text-amber-200">
-                Connect Freighter on Testnet to continue.
+                {SUBSCRIBE_COPY.ctaDisconnected}. {networkHint()}.
               </p>
             ) : (
               <Button
@@ -131,13 +139,17 @@ export default function PayPlanPage({
                 disabled={busy}
                 onClick={() => void handleSubscribe()}
               >
-                {busy ? "Confirm in Freighter…" : "Approve & subscribe"}
+                {busy ? SUBSCRIBE_COPY.freighterBusy : SUBSCRIBE_COPY.ctaConnected}
               </Button>
             )}
             {status && (
               <p className="text-sm text-sea">{status}</p>
             )}
-            {errorMsg && <p className="text-sm text-destructive">{errorMsg}</p>}
+            {errorMsg && (
+              <p className="text-sm text-destructive" role="alert">
+                {errorMsg}
+              </p>
+            )}
           </div>
 
           <p className="text-xs text-muted-foreground">
