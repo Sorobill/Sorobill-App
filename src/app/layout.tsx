@@ -25,7 +25,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <body className="font-body antialiased" style={fontVars}>
         <SkipLink />
-        <Providers>{children}</Providers>
+        <div id="main-content">
+          <Providers>{children}</Providers>
+        </div>
       </body>
     </html>
   );
