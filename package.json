@@ -1,7 +1,7 @@
 {
   "name": "sorobill-app",
   "version": "0.1.0",
-  "description": "Stripe for recurring global payments — powered by Stellar Soroban",
+  "description": "Stripe for recurring global payments \u2014 powered by Stellar Soroban",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,7 +10,9 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
-    "verify": "tsc --noEmit && next build"
+    "verify": "tsc --noEmit && next build",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@fontsource/manrope": "^5.3.0",
@@ -53,6 +55,8 @@
     "postcss": "^8.5.28",
     "prettier": "^3.4.2",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite-tsconfig-paths": "5.1.4",
+    "vitest": "3.2.4"
   }
 }
