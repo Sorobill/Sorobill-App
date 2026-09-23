@@ -193,3 +193,10 @@ Open a [GitHub Issue](https://github.com/Sorobill/Sorobill-App/issues/new?templa
 - Console errors (if any)
 
 For security vulnerabilities, see [SECURITY.md](SECURITY.md) — **do not open a public issue**.
+
+## Live demo
+
+Deployed frontend: https://sorobill-app.vercel.app
+
+Share links in production must use `NEXT_PUBLIC_APP_URL=https://sorobill-app.vercel.app`.
+See [DEMO.md](../DEMO.md) and [DEMO_SCRIPT.md](./DEMO_SCRIPT.md).
