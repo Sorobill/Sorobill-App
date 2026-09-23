@@ -37,12 +37,15 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   if (!res.ok) {
-    let message = `API error ${res.status}`;
+    let message = `API request failed (${res.status}) for ${path}`;
     try {
       const body = (await res.json()) as { message?: string; error?: string };
-      message = body.message ?? (typeof body.error === "string" ? body.error : message);
+      message =
+        body.message ??
+        (typeof body.error === "string" ? body.error : message);
     } catch {
-      // ignore parse errors
+      if (res.status === 404) message = `Resource not found (${path})`;
+      else if (res.status >= 500) message = `Backend unavailable (${res.status}). Is Sorobill-Backend running?`;
     }
     throw new Error(message);
   }
