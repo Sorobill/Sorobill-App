@@ -14,15 +14,17 @@ import { validateApiPlan } from "@/lib/validate-api-plan";
 import { formatAssetAmount, formatInterval } from "@/lib/format";
 import { invokeApproveToken, invokeSubscribe } from "@/lib/contract";
 import { useWalletStore } from "@/stores/wallet-store";
+import { useFreighter } from "@/hooks/use-freighter";
 import { SUBSCRIBE_COPY } from "@/lib/subscribe-copy";
 import { networkHint } from "@/lib/network-label";
 import { announce } from "@/lib/a11y";
 import { getExplorerUrl } from "@/lib/stellar";
 import { contractUserMessage } from "@/lib/contract-errors";
+import { FREIGHTER_INSTALL_URL } from "@/lib/freighter-errors";
 
 async function fetchPlan(id: string): Promise<ApiPlan> {
   if (env.app.useMock) {
-    // Keep in sync with /plans mock list — plan_1 is the Loom Starter demo
+    // Keep in sync with /plans mock list - plan_1 is the Loom Starter demo
     const catalog: Record<string, Pick<ApiPlan, "name" | "amount" | "contractPlanId">> = {
       plan_1: { name: "Starter", amount: "9.99", contractPlanId: 3 },
       plan_2: { name: "Pro", amount: "29.99", contractPlanId: 2 },
@@ -42,7 +44,7 @@ async function fetchPlan(id: string): Promise<ApiPlan> {
       createdAt: new Date().toISOString(),
     };
   }
-  const res = await fetch(`${env.app.apiUrl.replace(/\/$/, "")}/plans/${id}`);
+  const res = await fetch(${env.app.apiUrl.replace(/\/$/, "")}/plans/);
   if (!res.ok) throw new Error("Plan not found. Check the share link or ask the merchant for a new one.");
   const json: unknown = await res.json();
   return validateApiPlan(json);
@@ -55,6 +57,8 @@ export default function PayPlanPage({
 }) {
   const { planId } = use(params);
   const address = useWalletStore((s) => s.address);
+  const network = useWalletStore((s) => s.network);
+  const { isAvailable } = useFreighter();
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [txUrl, setTxUrl] = useState<string | null>(null);
@@ -67,6 +71,10 @@ export default function PayPlanPage({
 
   async function handleSubscribe() {
     if (!address || !data) return;
+    if (network === "mainnet") {
+      setErrorMsg("Freighter is connected to Mainnet. Switch Freighter to Testnet to proceed with checkout.");
+      return;
+    }
     const onChainId = data.contractPlanId;
     if (onChainId == null) {
       setErrorMsg(SUBSCRIBE_COPY.missingContractPlan);
@@ -85,15 +93,15 @@ export default function PayPlanPage({
         return;
       }
       const approveAmount = String(Number(data.amount) * 12);
-      setStatus(`Approving allowance for on-chain plan ${onChainId}…`);
+      setStatus(Approving allowance for on-chain plan .);
       announce("Approving token allowance");
       const approve = await invokeApproveToken(address, approveAmount);
-      setStatus(`Allowance set · ${approve.hash.slice(0, 10)}… Signing subscribe…`);
+      setStatus(Allowance set  . Signing subscribe.);
       announce("Signing subscribe transaction");
       const { hash } = await invokeSubscribe(address, onChainId);
       const url = getExplorerUrl(hash);
       setTxUrl(url);
-      const ok = `Subscribed on Testnet (plan ${onChainId}) · ${hash.slice(0, 10)}…`;
+      const ok = Subscribed on Testnet (plan )  .;
       setStatus(ok);
       announce(ok);
     } catch (err) {
@@ -104,7 +112,7 @@ export default function PayPlanPage({
     }
   }
 
-  if (isLoading) return <LoadingState label="Loading plan…" />;
+  if (isLoading) return <LoadingState label="Loading plan." />;
   if (error) {
     return (
       <ErrorState
@@ -144,14 +152,50 @@ export default function PayPlanPage({
 
           <div className="space-y-3 border border-border bg-background p-5">
             {!address ? (
-              <p className="text-sm text-amber-800 dark:text-amber-200">
-                {SUBSCRIBE_COPY.ctaDisconnected}. {networkHint()}.
-              </p>
+              <div className="space-y-2">
+                <p className="text-sm text-amber-800 dark:text-amber-200">
+                  {SUBSCRIBE_COPY.ctaDisconnected}. {networkHint()}.
+                </p>
+                {!isAvailable && (
+                  <p className="text-xs text-muted-foreground">
+                    Freighter wallet extension not detected.{" "}
+                    <a
+                      href={FREIGHTER_INSTALL_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sea underline underline-offset-2 hover:opacity-80"
+                    >
+                      Install Freighter
+                    </a>{" "}
+                    to connect on Testnet.
+                  </p>
+                )}
+              </div>
+            ) : network === "mainnet" ? (
+              <div className="space-y-3">
+                <div
+                  className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-200"
+                  role="alert"
+                >
+                  <p className="font-semibold">Wrong Network Detected</p>
+                  <p className="mt-0.5">
+                    Freighter is connected to Mainnet. Please switch your Freighter wallet to <strong>Testnet</strong> to complete subscription checkout.
+                  </p>
+                </div>
+                <Button
+                  className="w-full opacity-60 cursor-not-allowed"
+                  size="lg"
+                  aria-label={Switch to Testnet to subscribe to }
+                  disabled
+                >
+                  Switch to Testnet to Subscribe
+                </Button>
+              </div>
             ) : (
               <Button
                 className="w-full"
                 size="lg"
-                aria-label={`Subscribe to ${plan.name}`}
+                aria-label={Subscribe to }
                 disabled={busy}
                 onClick={() => void handleSubscribe()}
               >
@@ -185,8 +229,8 @@ export default function PayPlanPage({
 
           <p className="text-xs text-muted-foreground">
             Merchant{" "}
-            <span className="font-mono">{plan.merchantId || "—"}</span>
-            {" · "}
+            <span className="font-mono">{plan.merchantId || "-"}</span>
+            {"  "}
             <Link href="/plans" className="text-sea hover:underline">
               All plans
             </Link>
