@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { PlusCircle } from "lucide-react";
 import { StatusBadge } from "@/components/status-badge";
 import { LoadingSpinner, ErrorState, EmptyState } from "@/components/states";
 import { Button } from "@/components/ui/button";
@@ -24,7 +26,7 @@ export default function SubscribersPage() {
         nextBillingAt: s.nextBillingAt,
       }))
     );
-    downloadCsv(`sorobill-subscribers-${Date.now()}.csv`, csv);
+    downloadCsv(sorobill-subscribers-${Date.now()}.csv, csv);
   }
 
   return (
@@ -52,14 +54,22 @@ export default function SubscribersPage() {
         />
       )}
 
-      {address && isLoading && <LoadingSpinner text="Loading subscribers…" />}
+      {address && isLoading && <LoadingSpinner text="Loading subscribers." />}
       {address && error && (
         <ErrorState message="Failed to load subscribers." onRetry={() => refetch()} />
       )}
       {address && !isLoading && !error && subs?.length === 0 && (
         <EmptyState
           title="No subscribers yet"
-          description="Share your plans to start getting subscribers."
+          description="Share your plans or create new ones to start receiving recurring subscribers."
+          action={
+            <Button asChild size="sm">
+              <Link href="/dashboard/plans" className="inline-flex items-center gap-1.5">
+                <PlusCircle className="h-4 w-4" aria-hidden />
+                <span>Create & Share Plans</span>
+              </Link>
+            </Button>
+          }
         />
       )}
 
